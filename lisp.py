@@ -99,6 +99,10 @@ class LispParser(Parser):
 lexer = LispLexer()    
 parser = LispParser()
 
+
+
+source = '(* (+ 10 (+ 100 20) (/ 10 5)) 50)'
+
 ast = parser.parse(lexer.tokenize(source))
 #print( ast )
 #print_ast(ast)

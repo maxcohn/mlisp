@@ -4,6 +4,7 @@
 # TODO: NEED defun, setq, if, strings, print
 
 from typing import List
+import sys
 
 
 class ASTNode():
@@ -47,11 +48,28 @@ class ExprNum(Expr):
     def __init__(self, val: int):
         self.val = val
 
+    def __int__(self):
+        return self.val
+
     def eval_node(self):
         return self.val
 
     def __add__(self, other):
-        return ExprNum(other + self.val)
+        # in case other is an int, just add the int so we don't try to access .val
+        v = other if type(other) is int else other.val
+        #print(f'other ({type(other)}), self ({type(self.val)})')
+        return ExprNum(v + self.val)
+
+    __radd__ = __add__
+
+    def __mul__(self, other):
+        # in case other is an int, just mult the int so we don't try to access
+        # to acess the int's 'val' attribute, which doesn't exist
+        v = other if type(other) is int else other.val
+
+        return ExprNum(v * self.val)
+
+    __rmul__ = __mul__
 
     def __str__(self):
         return str(self.val)
@@ -64,9 +82,10 @@ class PrimOp(Expr):
         self.vals = vals
 
     def eval_node(self):
-        total = ExprNum(0)
+        total = 0
         if self.op == '+':
             for v in self.vals:
+                #print(type(v), sys.stderr)
                 total += v.eval_node()
 
         elif self.op == '-':
@@ -75,17 +94,19 @@ class PrimOp(Expr):
                 total -= v.eval_node()
 
         elif self.op == '*':
-            total = Expr(1)
+            total = 1
             for v in self.vals:
+                #print(f'v: {type(v)}, v.eval_node(): {type(v.eval_node())}, total: {type(total)}')
+
                 total *= v.eval_node()
 
         elif self.op == '/':
             total = self.vals[0].eval_node()
             for v in self.vals[1:]:
-                total /= v.eval_node()
+                total = int(total / v.eval_node())
 
         return ExprNum(total)
 
-p = Program(PrimOp('+', [ExprNum(10), ExprNum(20), ExprNum(40)]))
+#p = Program(PrimOp('+', [ExprNum(10), ExprNum(20), ExprNum(40)]))
 
-print(p.eval_node())
+#print(p.eval_node())

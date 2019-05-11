@@ -94,37 +94,7 @@ ast = parser.parse(lexer.tokenize(source))
 print( ast )
 print_ast(ast)
 
-class ASTNode():
-    pass
 
-class Operator(ASTNode):
-
-    def __init__(self, op, vals):
-        self.op = op
-        self.vals = vals
-
-    def eval_node(self):
-        total = 0
-        if self.op == '+':
-            for v in self.vals:
-                total += v
-
-        elif self.op == '-':
-            total = self.vals[0]
-            for v in self.vals[1:]:
-                total -= v
-
-        elif self.op == '*':
-            total = 1
-            for v in self.vals:
-                total *= v
-
-        elif self.op == '/':
-            total = self.vals[0]
-            for v in self.vals[1:]:
-                total /= v
-
-        return total
 
 o = Operator('/', [100, 5, 4])
 print(o.eval_node())

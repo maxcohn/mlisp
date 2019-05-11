@@ -1,11 +1,12 @@
 from sly import Lexer, Parser
+from nodes import *
 
 # Current goals:
 # Primative operations: +, -, *, /
 # Evaluation of syntax tree (maybe save things as objects)
 
-source = '(+ 10 (- 20 30))'
-
+source = '"hello world"'#'(+ 10 (- 50 30))'
+#source = '(+ 10 20 40)'
 def print_ast_help(ast: tuple, indent: int):
     for v in ast:
         #print(type(v))
@@ -20,7 +21,7 @@ def print_ast(ast: tuple):
 
 class LispLexer(Lexer):
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
-        MINUS, MULT, DIV
+        MINUS, MULT, DIV, SETQ, IF, STRING, PRINT
     }
 
     ignore = ' \t'
@@ -35,8 +36,12 @@ class LispLexer(Lexer):
     MINUS = r'\-'
     MULT = r'\*'
     DIV = r'/'
+    STRING = '"[^"]*"'
 
     SYMBOL['defun'] = DEFUN
+    SYMBOL['setq'] = SETQ
+    SYMBOL['if'] = IF
+    SYMBOL['print'] = PRINT
     
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -50,9 +55,9 @@ class LispLexer(Lexer):
         print(f'Illegal character {t.value[0]}')
         self.index += 1
    
-lexer = LispLexer()
-for t in lexer.tokenize(source):
-    print(f'{t.type}, {t.value}')
+#lexer = LispLexer()
+#for t in lexer.tokenize(source):
+#    print(f'{t.type}, {t.value}')
 
 class LispParser(Parser):
     tokens = LispLexer.tokens
@@ -60,7 +65,7 @@ class LispParser(Parser):
     
     @_('expr')
     def program(self, p):
-        return ('program', p.expr)
+        return Program(p.expr)
 
     @_('exprseq expr')
     def exprseq(self, p):
@@ -72,11 +77,11 @@ class LispParser(Parser):
 
     @_('NUMBER')
     def expr(self, p):
-        return ('expr', p.NUMBER)
+        return ExprNum(p.NUMBER)
     
     @_('LPAREN op exprseq RPAREN')
     def expr(self, p):
-        return ('expr', p.op, p.exprseq)
+        return PrimOp(p.op, p.exprseq)
 
     """ @_('SYMBOL')
     def expr(self, p):
@@ -84,17 +89,21 @@ class LispParser(Parser):
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV')
     def op(self, p):
-        return ('operator', p[0])
+        return p[0]
+
+    @_('STRING')
+    def expr(self, p):
+        return ExprStr(p[0])
 
 
 lexer = LispLexer()    
 parser = LispParser()
 
 ast = parser.parse(lexer.tokenize(source))
-print( ast )
-print_ast(ast)
+#print( ast )
+#print_ast(ast)
 
 
+#o = Operator('/', [100, 5, 4])
+print(ast.eval_node())
 
-o = Operator('/', [100, 5, 4])
-print(o.eval_node())

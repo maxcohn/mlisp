@@ -1,6 +1,8 @@
 # nodes.py
 #
 # TODO: make all objects for non-terminals
+# TODO: NEED defun, setq, if, strings, print
+
 from typing import List
 
 
@@ -8,13 +10,18 @@ class ASTNode():
     def eval_node(self):
         pass
 
+class Program(ASTNode):
 
-
-class Expr(ASTNode):
-    val = None
+    def __init__(self, expr):
+        self.expr = expr
 
     def eval_node(self):
-        pass
+        return self.expr.eval_node()
+
+class Expr(ASTNode):
+
+    def eval_node(self):
+        raise Exception("uh oh")
     
 
 class ExprSeq(ASTNode):
@@ -23,14 +30,31 @@ class ExprSeq(ASTNode):
     def __init__(self, exprs: list):
         self.exprs = exprs
 
-# evaluates to integer
+class ExprStr(Expr):
+
+    def __init__(self, val: str):
+        self.val = val
+    
+    def eval_node(self):
+        return self.val
+    
+    def __str__(self):
+        return self.val
+
+# evaluates to number
 class ExprNum(Expr):
 
-    def __init__(self, val):
+    def __init__(self, val: int):
         self.val = val
 
     def eval_node(self):
         return self.val
+
+    def __add__(self, other):
+        return ExprNum(other + self.val)
+
+    def __str__(self):
+        return str(self.val)
 
 # evaluates to ExprNum
 class PrimOp(Expr):
@@ -40,7 +64,7 @@ class PrimOp(Expr):
         self.vals = vals
 
     def eval_node(self):
-        total = 0
+        total = ExprNum(0)
         if self.op == '+':
             for v in self.vals:
                 total += v.eval_node()
@@ -51,7 +75,7 @@ class PrimOp(Expr):
                 total -= v.eval_node()
 
         elif self.op == '*':
-            total = 1
+            total = Expr(1)
             for v in self.vals:
                 total *= v.eval_node()
 
@@ -62,6 +86,6 @@ class PrimOp(Expr):
 
         return ExprNum(total)
 
-p = PrimOp('+', [ExprNum(100), ExprNum(20), ExprNum(30)])
+p = Program(PrimOp('+', [ExprNum(10), ExprNum(20), ExprNum(40)]))
 
-print(p.eval_node().val)
+print(p.eval_node())

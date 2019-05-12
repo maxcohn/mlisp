@@ -92,11 +92,16 @@ class LispParser(Parser):
     @_('SYMBOL')
     def expr(self, p):
         # lookup symbol and return if exists, otherwise, raise exception
-        if p.symbol not in symbol_table:
+        if p.SYMBOL not in symbol_table:
             raise SymbolNotFoundException(f'Symbol "{p.SYMBOL}" was not found')
-            
-        return symbol_table[p.symbol]
         
+        val = symbol_table[p.SYMBOL]
+        if type(val) is str:
+            return ExprStr(val)
+        elif type(val) is int:
+            return ExprNum(val)
+        
+        raise Exception('uh oh, thats not a valid symbol')
         
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV')

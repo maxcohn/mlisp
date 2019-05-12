@@ -15,4 +15,4 @@ if __name__ == "__main__":
 
         ast = parser.parse(lexer.tokenize(i))
         print(ast.eval_node())
-        #print(nodes.symbol_table)
+        print(nodes.symbol_table)

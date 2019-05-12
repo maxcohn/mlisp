@@ -35,6 +35,10 @@ class Assignment(Expr):
 
     def eval_node(self):
         expr_val = self.expr.eval_node()
+
+        while isinstance(expr_val, Expr):    
+            expr_val = expr_val.eval_node()
+
         symbol_table[self.symbol] = expr_val
         return expr_val
 

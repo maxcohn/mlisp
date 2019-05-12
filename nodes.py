@@ -1,7 +1,7 @@
 # nodes.py
 #
 # TODO: make all objects for non-terminals
-# TODO: NEED defun, setq, if, print
+# TODO: NEED defun, if, print
 
 from exceptions import *
 
@@ -26,7 +26,18 @@ class Expr(ASTNode):
 
     def eval_node(self):
         raise Exception("uh oh")
+
+
+class UserFuncDec(ASTNode):
+    paramaters = []
     
+    def __init__(self, params, expr):
+        self.paramaters = params
+        self.expr = expr
+
+class UserFuncCall(Expr):
+    pass
+
 class Assignment(Expr):
 
     def __init__(self, symbol, expr: Expr):
@@ -131,3 +142,20 @@ class PrimOp(Expr):
 #p = Program(PrimOp('+', [ExprNum(10), ExprNum(20), ExprNum(40)]))
 
 #print(p.eval_node())
+
+class Environment():
+    
+    symbol_table = { }
+
+    def __init__(self, prev):
+        self.prev_env = prev
+
+    def lookup(self, symbol: str):
+        if symbol not in symbol_table:
+            raise SymbolNotFoundException(f'Symbol: "{symbol}" not found')
+
+        return symbol_table[symbol]
+
+    def add_symbol(self, symbol, val):
+        symbol_table[symbol] = val
+        

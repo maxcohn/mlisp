@@ -108,10 +108,24 @@ class LispParser(Parser):
     def op(self, p):
         return p[0]
     
+    # change this to assignment and have expr that points to it?
     @_('LPAREN SETQ SYMBOL expr RPAREN')
     def expr(self, p):
         symbol_table[p.SYMBOL] = p.expr
         return Assignment(p.SYMBOL, p.expr)
+
+    # same idea here with renaming?
+    @_('LPAREN DEFUN SYMBOL expr RPAREN')
+    def expr(self, p):
+        pass
+
+    @_('LPAREN funccall RPAREN')
+    def expr(self, p):
+        pass
+    
+    @_('SYMBOL exprseq')
+    def funccall(self, p):
+        pass
     
 
 

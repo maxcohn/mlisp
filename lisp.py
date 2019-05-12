@@ -1,29 +1,17 @@
+"""Lexer and Parser
+
+This file contains the lexer and parser for the interpreter
+"""
+
 from sly import Lexer, Parser
 from nodes import *
 from exceptions import *
 
-# Current goals:
-# Primative operations: +, -, *, /
-# Evaluation of syntax tree (maybe save things as objects)
-
-
-#source = '"hello world"'#'(+ 10 (- 50 30))'
-#source = '(+ 10 20 40)'
-"""
-def print_ast_help(ast: tuple, indent: int):
-    for v in ast:
-        #print(type(v))
-        if type(v) is tuple or type(v) is list:
-            print_ast_help(v, indent + 1)
-        else:
-            print(f'{"--" * indent} {v}')
-
-def print_ast(ast: tuple):
-    print_ast_help(ast, 0)
-
-"""
+# Current goals: IF statements, print
 
 class LispLexer(Lexer):
+    """Lexer for this Lisp interpreter (using SLY)"""
+
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
         MINUS, MULT, DIV, SETQ, STRING#, PRINT, IF
     }
@@ -59,11 +47,13 @@ class LispLexer(Lexer):
         print(f'Illegal character {t.value[0]}')
         self.index += 1
    
-#lexer = LispLexer()
-#for t in lexer.tokenize(source):
-#    print(f'{t.type}, {t.value}')
-
 class LispParser(Parser):
+    """Parser for the lisp interpreter (using SLY)
+    
+    This class holds all our grammar rules, which in turn call functions to
+    build an abstract syntax tree
+    """
+
     tokens = LispLexer.tokens
  
     @_('expr')
@@ -92,16 +82,6 @@ class LispParser(Parser):
     def expr(self, p):
         # lookup symbol and return if exists, otherwise, raise exception
         return ExprSym(p.SYMBOL)
-        """if p.SYMBOL not in symbol_table:
-            raise SymbolNotFound(f'Symbol "{p.SYMBOL}" was not found')
-        
-        val = symbol_table[p.SYMBOL]
-        if type(val) is str:
-            return ExprStr(val)
-        elif type(val) is int:
-            return ExprNum(val)
-        
-        raise Exception('uh oh, thats not a valid symbol')"""
         
     # same idea here with renaming?
     @_('LPAREN funcdef RPAREN')
@@ -166,20 +146,3 @@ class LispParser(Parser):
     @_('op exprseq')
     def funccall(self, p):
         return PrimOp(p.op, p.exprseq)
-
-
-#lexer = LispLexer()    
-#parser = LispParser()
-
-
-
-#source = '(* (+ 10 (+ 100 20) (/ 10 5)) 50)'
-
-#ast = parser.parse(lexer.tokenize(source))
-#print( ast )
-#print_ast(ast)
-
-
-#o = Operator('/', [100, 5, 4])
-#print(ast.eval_node())
-

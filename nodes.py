@@ -1,14 +1,13 @@
+"""Abstract Syntax Tree Nodes
+
+All the nodes used to construct an abstract syntax tree
+"""
+
 # nodes.py
 #
-# TODO: make all objects for non-terminals
-# TODO: NEED defun, if, print
+# TODO: NEED  if, print, empty param list (new grammar rule)
 
 from exceptions import *
-
-#############################333
-# Temporary symbol table
-###################################
-symbol_table = { }
 
 class ASTNode():
     def eval_node(self, env):
@@ -63,7 +62,7 @@ class ExprNum(Expr):
     def __add__(self, other):
         # in case other is an int, just add the int so we don't try to access .val
         v = other if type(other) is int else other.val
-        #print(f'other ({type(other)}), self ({type(self.val)})')
+
         return ExprNum(v + self.val)
 
     __radd__ = __add__
@@ -88,12 +87,12 @@ class ExprSym(Expr):
     def eval_node(self, env):
         v = env.lookup(self.val)
 
-        print(f'symbol: {type(v)}')
-
         if type(v) is str:
             return ExprStr(v)
         elif type(v) is int:
             return ExprNum(v)
+        elif isinstance(v, ExprSym):
+            return self.eval_node(env)
         elif isinstance(v, Expr):
             return v
 
@@ -110,7 +109,7 @@ class FuncDef(ASTNode):
     def eval_node(self, env):
         env.add_symbol(self.symbol, self)
 
-        return self.symbol # does this print the name?
+        return self.symbol
 
 class FuncCall(Expr):
 
@@ -125,15 +124,10 @@ class FuncCall(Expr):
             raise IncorrectNumOfArgs(f'''Function: "{func.symbol}" was given \
                 {len(self.args)} arguments, when it takes {len(func.params)}''')
         
-        # map param symbols with their given args
-        mapping = [ (func.params[i], self.args[i]) for i in range(len(self.args)) ]
-        
         new_env = Environment(env)
         for i in range(len(self.args)):
-            print(f'adding new symbol: ({func.params[i]},{self.args[i]})')
             new_env.add_symbol(func.params[i], self.args[i])
         
-        print(f'new_env: {new_env.symbol_table}')
         return func.expr.eval_node(new_env)
 
 # evaluates to ExprNum
@@ -147,10 +141,6 @@ class PrimOp(Expr):
         total = 0
         if self.op == '+':
             for v in self.vals:
-                #print(type(v), sys.stderr)
-                print(f'v = {type(v.val)}')
-                print(f'v.eval_node(env) = {v.eval_node(env)}')
-                print(f'env = {env.symbol_table}')
                 total += v.eval_node(env)
 
         elif self.op == '-':
@@ -161,8 +151,6 @@ class PrimOp(Expr):
         elif self.op == '*':
             total = 1
             for v in self.vals:
-                #print(f'v: {type(v)}, v.eval_node(env): {type(v.eval_node(env))}, total: {type(total)}')
-
                 total *= v.eval_node(env)
 
         elif self.op == '/':
@@ -188,14 +176,11 @@ class Assignment(Expr):
         if type(expr_val) is str:
             expr_val = expr_val[1:-1]
 
-        #print(f'symbol:{self.symbol}, val:{expr_val}')
         env.add_symbol(self.symbol, expr_val)
 
         return expr_val
 
-#p = Program(PrimOp('+', [ExprNum(10), ExprNum(20), ExprNum(40)]))
 
-#print(p.eval_node(env))
 
 
 
@@ -217,7 +202,5 @@ class Environment():
 
     def add_symbol(self, symbol: str, val):
         self.symbol_table[symbol] = val
-    
-    def print_table(self):
-        print(self.symbol_table)
+
         

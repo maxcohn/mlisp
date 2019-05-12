@@ -1,6 +1,7 @@
-# exceptions.py
+"""Exceptions
 
-
+All the exceptions used for specific cases for the interpreter.
+"""
 
 class SymbolNotFound(Exception):
     """Raised when symbol cannot be found in table"""

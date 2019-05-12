@@ -7,8 +7,9 @@ from exceptions import *
 # Evaluation of syntax tree (maybe save things as objects)
 
 
-source = '"hello world"'#'(+ 10 (- 50 30))'
+#source = '"hello world"'#'(+ 10 (- 50 30))'
 #source = '(+ 10 20 40)'
+"""
 def print_ast_help(ast: tuple, indent: int):
     for v in ast:
         #print(type(v))
@@ -20,10 +21,11 @@ def print_ast_help(ast: tuple, indent: int):
 def print_ast(ast: tuple):
     print_ast_help(ast, 0)
 
+"""
 
 class LispLexer(Lexer):
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
-        MINUS, MULT, DIV, SETQ, IF, STRING, PRINT
+        MINUS, MULT, DIV, SETQ, STRING#, PRINT, IF
     }
 
     ignore = ' \t'
@@ -42,8 +44,8 @@ class LispLexer(Lexer):
 
     SYMBOL['defun'] = DEFUN
     SYMBOL['setq'] = SETQ
-    SYMBOL['if'] = IF
-    SYMBOL['print'] = PRINT
+    #SYMBOL['if'] = IF
+    #SYMBOL['print'] = PRINT
     
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -63,11 +65,56 @@ class LispLexer(Lexer):
 
 class LispParser(Parser):
     tokens = LispLexer.tokens
-
-    
+ 
     @_('expr')
     def program(self, p):
         return Program(p.expr)
+
+    ############################################################
+    # Expressions
+    ############################################################
+    @_('NUMBER')
+    def expr(self, p):
+        return ExprNum(p.NUMBER)
+    
+    """
+    # change to function call
+    @_('LPAREN op exprseq RPAREN')
+    def expr(self, p):
+        return PrimOp(p.op, p.exprseq)
+    """
+
+    @_('STRING')
+    def expr(self, p):
+        return ExprStr(p[0])
+
+    @_('SYMBOL')
+    def expr(self, p):
+        # lookup symbol and return if exists, otherwise, raise exception
+        return ExprSym(p.SYMBOL)
+        """if p.SYMBOL not in symbol_table:
+            raise SymbolNotFound(f'Symbol "{p.SYMBOL}" was not found')
+        
+        val = symbol_table[p.SYMBOL]
+        if type(val) is str:
+            return ExprStr(val)
+        elif type(val) is int:
+            return ExprNum(val)
+        
+        raise Exception('uh oh, thats not a valid symbol')"""
+        
+    # same idea here with renaming?
+    @_('LPAREN funcdef RPAREN')
+    def expr(self, p):
+        return p.funcdef
+
+    @_('LPAREN funccall RPAREN')
+    def expr(self, p):
+        return p.funccall
+
+    @_('LPAREN assignment RPAREN')
+    def expr(self, p):
+        return p.assignment
 
     @_('exprseq expr')
     def exprseq(self, p):
@@ -77,66 +124,58 @@ class LispParser(Parser):
     def exprseq(self, p):
         return [p.expr]
 
-    @_('NUMBER')
-    def expr(self, p):
-        return ExprNum(p.NUMBER)
-    
-    @_('LPAREN op exprseq RPAREN')
-    def expr(self, p):
-        return PrimOp(p.op, p.exprseq)
+    ############################################################
+    # Functions
+    ############################################################
 
-    @_('STRING')
-    def expr(self, p):
-        return ExprStr(p[0])
-
-    @_('SYMBOL')
-    def expr(self, p):
-        # lookup symbol and return if exists, otherwise, raise exception
-        if p.SYMBOL not in symbol_table:
-            raise SymbolNotFoundException(f'Symbol "{p.SYMBOL}" was not found')
-        
-        val = symbol_table[p.SYMBOL]
-        if type(val) is str:
-            return ExprStr(val)
-        elif type(val) is int:
-            return ExprNum(val)
-        
-        raise Exception('uh oh, thats not a valid symbol')
-        
+    @_('SETQ SYMBOL expr')
+    def assignment(self, p):
+        #TODO add to symbol table in Assignment (maybe pass in env?)
+        return Assignment(p.SYMBOL, p.expr)
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV')
     def op(self, p):
         return p[0]
     
-    # change this to assignment and have expr that points to it?
-    @_('LPAREN SETQ SYMBOL expr RPAREN')
-    def expr(self, p):
-        symbol_table[p.SYMBOL] = p.expr
-        return Assignment(p.SYMBOL, p.expr)
+    #TODO change to return an object instead of a string??
+    @_('SYMBOL')
+    def param(self, p):
+        return p.SYMBOL
 
-    # same idea here with renaming?
-    @_('LPAREN DEFUN SYMBOL expr RPAREN')
-    def expr(self, p):
-        pass
+    @_('paramseq param')
+    def paramseq(self, p):
+        return p.paramseq + [p.param]
 
-    @_('LPAREN funccall RPAREN')
-    def expr(self, p):
-        pass
-    
+    @_('param')
+    def paramseq(self, p):
+        return [p.param]
+
+    @_('LPAREN paramseq RPAREN')
+    def paramlist(self, p):
+        return p.paramseq
+        
+
+    @_('DEFUN SYMBOL paramlist expr')
+    def funcdef(self, p):
+        return FuncDef(p.SYMBOL, p.paramlist, p.expr)
+
     @_('SYMBOL exprseq')
     def funccall(self, p):
-        pass
-    
+        return FuncCall(p.SYMBOL, p.exprseq)
+
+    @_('op exprseq')
+    def funccall(self, p):
+        return PrimOp(p.op, p.exprseq)
 
 
-lexer = LispLexer()    
-parser = LispParser()
+#lexer = LispLexer()    
+#parser = LispParser()
 
 
 
-source = '(* (+ 10 (+ 100 20) (/ 10 5)) 50)'
+#source = '(* (+ 10 (+ 100 20) (/ 10 5)) 50)'
 
-ast = parser.parse(lexer.tokenize(source))
+#ast = parser.parse(lexer.tokenize(source))
 #print( ast )
 #print_ast(ast)
 

@@ -1,11 +1,14 @@
 # nodes.py
 #
 # TODO: make all objects for non-terminals
-# TODO: NEED defun, setq, if, strings, print
+# TODO: NEED defun, setq, if, print
 
-from typing import List
-import sys
+from exceptions import *
 
+#############################333
+# Temporary symbol table
+###################################
+symbol_table = { }
 
 class ASTNode():
     def eval_node(self):
@@ -24,6 +27,16 @@ class Expr(ASTNode):
     def eval_node(self):
         raise Exception("uh oh")
     
+class Assignment(Expr):
+
+    def __init__(self, symbol, expr: Expr):
+        self.symbol = symbol
+        self.expr = expr
+
+    def eval_node(self):
+        expr_val = self.expr.eval_node()
+        symbol_table[self.symbol] = expr_val
+        return expr_val
 
 class ExprSeq(ASTNode):
     exprs = None

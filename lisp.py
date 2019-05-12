@@ -1,9 +1,11 @@
 from sly import Lexer, Parser
 from nodes import *
+from exceptions import *
 
 # Current goals:
 # Primative operations: +, -, *, /
 # Evaluation of syntax tree (maybe save things as objects)
+
 
 source = '"hello world"'#'(+ 10 (- 50 30))'
 #source = '(+ 10 20 40)'
@@ -83,17 +85,29 @@ class LispParser(Parser):
     def expr(self, p):
         return PrimOp(p.op, p.exprseq)
 
-    """ @_('SYMBOL')
+    @_('STRING')
     def expr(self, p):
-        return ('expr', p.SYMBOL) """
+        return ExprStr(p[0])
+
+    @_('SYMBOL')
+    def expr(self, p):
+        # lookup symbol and return if exists, otherwise, raise exception
+        if p.symbol not in symbol_table:
+            raise SymbolNotFoundException(f'Symbol "{p.SYMBOL}" was not found')
+            
+        return symbol_table[p.symbol]
+        
+        
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV')
     def op(self, p):
         return p[0]
-
-    @_('STRING')
+    
+    @_('LPAREN SETQ SYMBOL expr RPAREN')
     def expr(self, p):
-        return ExprStr(p[0])
+        symbol_table[p.SYMBOL] = p.expr
+        return Assignment(p.SYMBOL, p.expr)
+    
 
 
 lexer = LispLexer()    
@@ -109,5 +123,5 @@ ast = parser.parse(lexer.tokenize(source))
 
 
 #o = Operator('/', [100, 5, 4])
-print(ast.eval_node())
+#print(ast.eval_node())
 

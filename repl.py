@@ -2,7 +2,7 @@
 
 # read evaluate print loop
 import lisp
-
+import nodes
 
 if __name__ == "__main__":
     print('Lisp!')
@@ -15,3 +15,4 @@ if __name__ == "__main__":
 
         ast = parser.parse(lexer.tokenize(i))
         print(ast.eval_node())
+        #print(nodes.symbol_table)

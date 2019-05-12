@@ -39,6 +39,10 @@ class Assignment(Expr):
         while isinstance(expr_val, Expr):    
             expr_val = expr_val.eval_node()
 
+        # if expr_val is a string, remove the quotes
+        if type(expr_val) is str:
+            expr_val = expr_val[1:-1]
+
         symbol_table[self.symbol] = expr_val
         return expr_val
 

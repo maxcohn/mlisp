@@ -80,6 +80,26 @@ class ExprNum(Expr):
     def __str__(self):
         return str(self.val)
 
+    def __gt__(self, other):
+        return self.val > other.val
+
+    def __ge__(self, other):
+        return self.val >= other.val
+
+    def __lt__(self, other):
+        return self.val < other.val
+    
+    def __le__(self, other):
+        return self.val <= other.val
+
+    def __eq__(self, other):
+        return self.val == other.val
+
+    def __ne__(self, other):
+        return self.val != other.val
+
+
+
 class ExprSym(Expr):
 
     def __init__(self, val):
@@ -134,11 +154,15 @@ class FuncCall(Expr):
 # evaluates to ExprNum
 class PrimOp(Expr):
 
+    _comparison_op = ['>', '<', '<=', '>=', '==', '!=']
+
+    _arithmatic_op = ['+', '/', '-', '*']
+
     def __init__(self, op, vals: list):
         self.op = op
         self.vals = vals
 
-    def eval_node(self, env):
+    def _arithmatic_eval(self, env):
         total = 0
         if self.op == '+':
             for v in self.vals:
@@ -160,6 +184,33 @@ class PrimOp(Expr):
                 total = int(total / v.eval_node(env))
 
         return ExprNum(total)
+
+    def _comparison_eval(self, env):
+        # check to make sure there are only two values
+        if len(self.vals) != 2:
+            raise IncorrectNumOfArgs(f'Operation "{self.op}" takes 2 arguments')
+
+        if self.op == '>':
+            return ExprNum(1 if self.vals[0] > self.vals[1] else 0)
+        elif self.op == '<':
+            return ExprNum(1 if self.vals[0] < self.vals[1] else 0)
+        elif self.op == '<=':
+            return ExprNum(1 if self.vals[0] <= self.vals[1] else 0)
+        elif self.op == '>=':
+            return ExprNum(1 if self.vals[0] >= self.vals[1] else 0)
+        elif self.op == '==':
+            return ExprNum(1 if self.vals[0] == self.vals[1] else 0)
+        elif self.op == '!=':
+            return ExprNum(1 if self.vals[0] != self.vals[1] else 0)
+
+
+    def eval_node(self, env):
+        
+        if self.op in self._arithmatic_op:
+            return self._arithmatic_eval(env)
+
+        elif self.op in self._comparison_op:
+            return self._comparison_eval(env)
 
 class Assignment(Expr):
 

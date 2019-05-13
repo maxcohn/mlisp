@@ -13,7 +13,8 @@ class LispLexer(Lexer):
     """Lexer for this Lisp interpreter (using SLY)"""
 
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
-        MINUS, MULT, DIV, SETQ, STRING#, PRINT, IF
+        MINUS, MULT, DIV, SETQ, STRING, IF, GT, LT, GTEQ,
+        LTEQ, EQ, NEQ#, PRINT, IF
     }
 
     ignore = ' \t'
@@ -29,10 +30,16 @@ class LispLexer(Lexer):
     MULT = r'\*'
     DIV = r'/'
     STRING = '"[^"]*"'
+    GTEQ = r'>='
+    LTEQ = r'<='
+    GT = r'>'
+    LT = r'<'
+    EQ = r'=='
+    NEQ = r'!='
 
     SYMBOL['defun'] = DEFUN
     SYMBOL['setq'] = SETQ
-    #SYMBOL['if'] = IF
+    SYMBOL['if'] = IF
     #SYMBOL['print'] = PRINT
     
     @_(r'\n+')
@@ -66,13 +73,6 @@ class LispParser(Parser):
     @_('NUMBER')
     def expr(self, p):
         return ExprNum(p.NUMBER)
-    
-    """
-    # change to function call
-    @_('LPAREN op exprseq RPAREN')
-    def expr(self, p):
-        return PrimOp(p.op, p.exprseq)
-    """
 
     @_('STRING')
     def expr(self, p):
@@ -113,7 +113,9 @@ class LispParser(Parser):
         #TODO add to symbol table in Assignment (maybe pass in env?)
         return Assignment(p.SYMBOL, p.expr)
 
-    @_('PLUS', 'MINUS', 'MULT', 'DIV')
+    @_('PLUS', 'MINUS', 'MULT', 'DIV', 'GT', 'LT',
+        'LTEQ', 'GTEQ', 'EQ', 'NEQ'
+    )
     def op(self, p):
         return p[0]
     

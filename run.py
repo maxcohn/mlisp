@@ -11,6 +11,7 @@ import nodes
 if __name__ == "__main__":
     source = None
 
+    # read in entire file
     with open(sys.argv[1]) as f:
         source = f.read()
 

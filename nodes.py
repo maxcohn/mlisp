@@ -115,7 +115,10 @@ class ExprNum(Expr):
         return self.val <= other
 
     def __eq__(self, other):
-        return self.val == other.val
+        if isinstance(other, Expr):
+            return self.val == other.val
+
+        return self.val == other
 
     def __ne__(self, other):
         if isinstance(other, Expr):
@@ -331,7 +334,7 @@ class Environment():
         symbol : str
             Symbol being looks for in the environment chain
         """
-        
+
         # if the symbol isn't in the current table
         if symbol not in self.symbol_table:
             # check the next environment

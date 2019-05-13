@@ -96,7 +96,10 @@ class ExprNum(Expr):
         return self.val == other.val
 
     def __ne__(self, other):
-        return self.val != other.val
+        if isinstance(other, Expr):
+            return self.val != other.val
+
+        return self.val != other
 
 
 
@@ -232,6 +235,19 @@ class Assignment(Expr):
 
         return expr_val
 
+class IfExpr(Expr):
+
+    def __init__(self, cond, act1, act2):
+        self.cond = cond
+        self.act1 = act1
+        self.act2 = act2
+
+    def eval_node(self, env):
+        if self.cond.eval_node(env) != (0):
+            return self.act1.eval_node(env)
+        
+        return self.act2.eval_node(env)
+        
 
 
 

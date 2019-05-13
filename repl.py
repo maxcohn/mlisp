@@ -28,11 +28,11 @@ if __name__ == "__main__":
         # create syntax tree and then evaluate/print
         ast = parser.parse(lexer.tokenize(i))
         
-        try:
-            print(ast.eval_node(init_env))
-        except Exception as e:
-            print(e)
-            continue
+        #try:
+        print(ast.eval_node(init_env))
+        #except Exception as e:
+        #    print(e)
+        #    continue
         
         #print(f'table = {init_env.symbol_table}')
         #for i in init_env.symbol_table:

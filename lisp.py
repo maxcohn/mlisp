@@ -96,6 +96,10 @@ class LispParser(Parser):
     def expr(self, p):
         return p.assignment
 
+    @_('LPAREN ifexpr RPAREN')
+    def expr(self, p):
+        return p.ifexpr
+
     @_('exprseq expr')
     def exprseq(self, p):
         return p.exprseq + [p.expr]
@@ -148,3 +152,7 @@ class LispParser(Parser):
     @_('op exprseq')
     def funccall(self, p):
         return PrimOp(p.op, p.exprseq)
+
+    @_('IF expr expr expr')
+    def ifexpr(self, p):
+        return IfExpr(p.expr0, p.expr1, p.expr2)

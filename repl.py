@@ -21,7 +21,10 @@ if __name__ == "__main__":
     # begin REPL
     while True:
         i = input('> ')
-           
+
+        if i.strip() == '(quit)':
+            break
+
         # create syntax tree and then evaluate/print
         ast = parser.parse(lexer.tokenize(i))
         
@@ -34,4 +37,5 @@ if __name__ == "__main__":
         #print(f'table = {init_env.symbol_table}')
         #for i in init_env.symbol_table:
         #    print(f'{i} type={type(i)}, {type(init_env.symbol_table[i])}')
-        
+
+    print('See ya!')   

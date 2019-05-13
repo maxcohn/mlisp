@@ -99,6 +99,10 @@ class LispParser(Parser):
     @_('LPAREN ifexpr RPAREN')
     def expr(self, p):
         return p.ifexpr
+    
+    @_('LPAREN printexpr RPAREN')
+    def expr(self, p):
+        return p.printexpr
 
     @_('exprseq expr')
     def exprseq(self, p):
@@ -114,7 +118,6 @@ class LispParser(Parser):
 
     @_('SETQ SYMBOL expr')
     def assignment(self, p):
-        #TODO add to symbol table in Assignment (maybe pass in env?)
         return Assignment(p.SYMBOL, p.expr)
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV', 'GT', 'LT',
@@ -159,5 +162,4 @@ class LispParser(Parser):
 
     @_('PRINT expr')
     def printexpr(self, p):
-        #TODO print(p.expr.eval_node((Environment(None))))
-        return p.expr
+        return PrintExpr(p.expr)

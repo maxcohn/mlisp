@@ -5,8 +5,7 @@ All the nodes used to construct an abstract syntax tree
 
 # nodes.py
 #
-# TODO: NEED  if, print, empty param list (new grammar rule)
-#TODO: comparisons: <,>,<=,>=,==, !=
+# TODO: NEED print, empty param list (new grammar rule)
 
 from exceptions import *
 import copy
@@ -263,7 +262,15 @@ class IfExpr(Expr):
         
         return self.act2.eval_node(env)
         
+class PrintExpr(Expr):
 
+    def __init__(self, expr: Expr):
+        self.expr = expr
+    
+    def eval_node(self, env):
+        v = self.expr.eval_node(env)
+        print(v)
+        return v
 
 
 

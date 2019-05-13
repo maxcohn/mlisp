@@ -6,6 +6,7 @@ All the nodes used to construct an abstract syntax tree
 # nodes.py
 #
 # TODO: NEED  if, print, empty param list (new grammar rule)
+#TODO: comparisons: <,>,<=,>=,==, !=
 
 from exceptions import *
 
@@ -126,7 +127,7 @@ class FuncCall(Expr):
         
         new_env = Environment(env)
         for i in range(len(self.args)):
-            new_env.add_symbol(func.params[i], self.args[i])
+            new_env.add_symbol(func.params[i], self.args[i].eval_node(env))
         
         return func.expr.eval_node(new_env)
 

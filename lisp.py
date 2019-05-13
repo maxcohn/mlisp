@@ -14,7 +14,7 @@ class LispLexer(Lexer):
 
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
         MINUS, MULT, DIV, SETQ, STRING, IF, GT, LT, GTEQ,
-        LTEQ, EQ, NEQ#, PRINT, IF
+        LTEQ, EQ, NEQ, PRINT
     }
 
     ignore = ' \t'
@@ -40,7 +40,7 @@ class LispLexer(Lexer):
     SYMBOL['defun'] = DEFUN
     SYMBOL['setq'] = SETQ
     SYMBOL['if'] = IF
-    #SYMBOL['print'] = PRINT
+    SYMBOL['print'] = PRINT
     
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -156,3 +156,8 @@ class LispParser(Parser):
     @_('IF expr expr expr')
     def ifexpr(self, p):
         return IfExpr(p.expr0, p.expr1, p.expr2)
+
+    @_('PRINT expr')
+    def printexpr(self, p):
+        #TODO print(p.expr.eval_node((Environment(None))))
+        return p.expr

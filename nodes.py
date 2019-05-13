@@ -68,6 +68,17 @@ class ExprNum(Expr):
 
     __radd__ = __add__
 
+    def __sub__(self, other):
+        v = other if type(other) is int else other.val
+
+        return ExprNum(self.val - v)
+    
+    def __rsub__(self, other):
+        v = other if type(other) is int else other.val
+
+        return ExprNum(v - self.val)
+
+
     def __mul__(self, other):
         # in case other is an int, just mult the int so we don't try to access
         # to acess the int's 'val' attribute, which doesn't exist
@@ -90,7 +101,10 @@ class ExprNum(Expr):
         return self.val < other.val
     
     def __le__(self, other):
-        return self.val <= other.val
+        if isinstance(other, Expr):
+            return self.val <= other.val
+
+        return self.val <= other
 
     def __eq__(self, other):
         return self.val == other.val
@@ -194,17 +208,17 @@ class PrimOp(Expr):
             raise IncorrectNumOfArgs(f'Operation "{self.op}" takes 2 arguments')
 
         if self.op == '>':
-            return ExprNum(1 if self.vals[0] > self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) > self.vals[1].eval_node(env) else 0)
         elif self.op == '<':
-            return ExprNum(1 if self.vals[0] < self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) < self.vals[1].eval_node(env) else 0)
         elif self.op == '<=':
-            return ExprNum(1 if self.vals[0] <= self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) <= self.vals[1].eval_node(env) else 0)
         elif self.op == '>=':
-            return ExprNum(1 if self.vals[0] >= self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) >= self.vals[1].eval_node(env) else 0)
         elif self.op == '==':
-            return ExprNum(1 if self.vals[0] == self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) == self.vals[1].eval_node(env) else 0)
         elif self.op == '!=':
-            return ExprNum(1 if self.vals[0] != self.vals[1] else 0)
+            return ExprNum(1 if self.vals[0].eval_node(env) != self.vals[1].eval_node(env) else 0)
 
 
     def eval_node(self, env):

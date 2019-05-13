@@ -34,8 +34,4 @@ if __name__ == "__main__":
         #    print(e)
         #    continue
         
-        #print(f'table = {init_env.symbol_table}')
-        #for i in init_env.symbol_table:
-        #    print(f'{i} type={type(i)}, {type(init_env.symbol_table[i])}')
-
     print('See ya!')   

@@ -9,6 +9,7 @@ All the nodes used to construct an abstract syntax tree
 #TODO: comparisons: <,>,<=,>=,==, !=
 
 from exceptions import *
+import copy
 
 class ASTNode():
     def eval_node(self, env):
@@ -268,10 +269,14 @@ class IfExpr(Expr):
 
 class Environment():
     
-    symbol_table = { }
+    # I'm leaving this line here as a permanent reminder as to how this creates
+    # a static variable. I've been tainted by my beloved C# and Java and though
+    # that this created an instance variable.
+    #symbol_table = { }
 
     def __init__(self, prev):
         self.prev_env = prev
+        self.symbol_table = {}
 
     def lookup(self, symbol: str):
         if symbol not in self.symbol_table:

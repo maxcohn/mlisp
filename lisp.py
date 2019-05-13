@@ -19,6 +19,7 @@ class LispLexer(Lexer):
 
     ignore = ' \t'
     ignore_comment = r';.*'
+    ignore_newline = r'\n+'
     
     # Tokens
     NUMBER = r'\-?\d+'
@@ -62,10 +63,11 @@ class LispParser(Parser):
     """
 
     tokens = LispLexer.tokens
- 
-    @_('expr')
+
+    #possibly make exprseq and eval_node on all exprs?
+    @_('exprseq')
     def program(self, p):
-        return Program(p.expr)
+        return Program(p.exprseq)
 
     ############################################################
     # Expressions

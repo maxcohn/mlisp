@@ -8,31 +8,37 @@ All the nodes used to construct an abstract syntax tree
 # TODO: NEED print, empty param list (new grammar rule)
 
 from exceptions import *
-import copy
 
 class ASTNode():
+    """Base class for all abstract syntax tree nodes"""
+
     def eval_node(self, env):
-        pass
+        """Evaluation function that all ASTNodes must implement"""
+        raise NotImplementedError("This node doesn't implement eval_node()")
+        
 
 class Program(ASTNode):
-
-    def __init__(self, expr):
-        self.expr = expr
+    """Starting node for all abstract syntax trees"""
+    def __init__(self, exprs):
+        self.exprs = exprs
 
     def eval_node(self, env):
-        return self.expr.eval_node(env)
+        v = None
+        for e in self.exprs:
+            v = e.eval_node(env)
+        return v
 
 ############################################################
 # Expressions
 ############################################################
 class Expr(ASTNode):
+    """Base class for all expression nodes"""
 
     def eval_node(self, env):
-        raise Exception("uh oh")
+        raise NotImplementedError("This node doesn't implement eval_node()")
 
 
 class ExprSeq(ASTNode):
-    exprs = None
 
     def __init__(self, exprs: list):
         self.exprs = exprs
@@ -40,7 +46,7 @@ class ExprSeq(ASTNode):
 class ExprStr(Expr):
 
     def __init__(self, val: str):
-        self.val = val
+        self.val = val[1:-1]
     
     def eval_node(self, env):
         return self.val

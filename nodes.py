@@ -46,19 +46,19 @@ class ExprSeq(ASTNode):
 class ExprStr(Expr):
     """String expression"""
     def __init__(self, val: str):
-        self.val = val#[1:-1] # remove quotes from string
+        self.val = StrVal(val[1:-1]) #remove quotes from string
     
     def eval_node(self, env):
-        return self.val[1:-1]
+        return self.val
     
     def __str__(self):
-        return self.val
+        return f'"{self.val}"'
 
 # evaluates to number
 class ExprNum(Expr):
     """Number expression"""
     def __init__(self, val: int):
-        self.val = val
+        self.val = NumVal(val)
 
     def __int__(self):
         return self.val
@@ -68,6 +68,8 @@ class ExprNum(Expr):
 
     # The following are operation overloaders for dealing with adding ExprNums
     def __add__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __add__()')
         # in case other is an int, just add the int so we don't try to access .val
         v = other if type(other) is int else other.val
 
@@ -76,17 +78,24 @@ class ExprNum(Expr):
     __radd__ = __add__
 
     def __sub__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __sub__()')
         v = other if type(other) is int else other.val
 
         return ExprNum(self.val - v)
     
     def __rsub__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __rsum__()')
         v = other if type(other) is int else other.val
 
         return ExprNum(v - self.val)
 
 
     def __mul__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __mul__()')
+
         # in case other is an int, just mult the int so we don't try to access
         # to acess the int's 'val' attribute, which doesn't exist
         v = other if type(other) is int else other.val
@@ -98,29 +107,42 @@ class ExprNum(Expr):
     def __str__(self):
         return str(self.val)
 
+    ##TODO REMOVE ALL BELOW
     # The following are overloaded comparison operators for dealing with ExprNums
     def __gt__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         return self.val > other.val
 
     def __ge__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         return self.val >= other.val
 
     def __lt__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         return self.val < other.val
     
     def __le__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         if isinstance(other, Expr):
             return self.val <= other.val
 
         return self.val <= other
 
     def __eq__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         if isinstance(other, Expr):
             return self.val == other.val
 
         return self.val == other
 
     def __ne__(self, other):
+        #TODO remove
+        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
         if isinstance(other, Expr):
             return self.val != other.val
 
@@ -136,7 +158,9 @@ class ExprSym(Expr):
         # we have to check in the environment
         v = env.lookup(self.val)
 
+        return v
 
+        """TODO remove
         # depending on the stype that the value is, return a different expression type
         if type(v) is str:
             return ExprStr(v)
@@ -148,11 +172,12 @@ class ExprSym(Expr):
             return self.eval_node(env)
         elif isinstance(v, Expr):
             return v
+        """
         
         raise Exception("Symbol was wasn't a valid type")
 
 ############################################################
-# Expressions
+# Functions
 ############################################################
 class FuncDef(ASTNode):
     """The definition of a user defined function"""
@@ -207,7 +232,7 @@ class PrimOp(Expr):
     _arithmatic_op = ['+', '/', '-', '*']
 
     # list of list operators
-    _list_op = ['HEAD', 'TAIL', 'APPEND', 'SPLICE']
+    _list_op = ['head', 'tail', 'append', 'splice']
 
     def __init__(self, op, vals: list):
         self.op = op
@@ -216,7 +241,7 @@ class PrimOp(Expr):
 
     def _arithmatic_eval(self, env):
         """Evaluates an arithmatic operator"""
-        total = 0
+        total = NumVal(0)
         if self.op == '+':
             for v in self.vals:
                 total += v.eval_node(env)
@@ -227,16 +252,16 @@ class PrimOp(Expr):
                 total -= v.eval_node(env)
 
         elif self.op == '*':
-            total = 1
+            total = NumVal(1)
             for v in self.vals:
                 total *= v.eval_node(env)
 
         elif self.op == '/':
             total = self.vals[0].eval_node(env)
             for v in self.vals[1:]:
-                total = int(total / v.eval_node(env))
+                total = total // v.eval_node(env)
 
-        return ExprNum(total)
+        return total#ExprNum(total)
 
     def _comparison_eval(self, env):
         # evaluates a comparison operator
@@ -245,21 +270,38 @@ class PrimOp(Expr):
         if len(self.vals) != 2:
             raise IncorrectNumOfArgs(f'Operation "{self.op}" takes 2 arguments')
 
+        val0 = self.vals[0]
+        val1 = self.vals[1]
         if self.op == '>':
-            return ExprNum(1 if self.vals[0].eval_node(env) > self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) > val1.eval_node(env) else 0)
         elif self.op == '<':
-            return ExprNum(1 if self.vals[0].eval_node(env) < self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) < val1.eval_node(env) else 0)
         elif self.op == '<=':
-            return ExprNum(1 if self.vals[0].eval_node(env) <= self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) <= val1.eval_node(env) else 0)
         elif self.op == '>=':
-            return ExprNum(1 if self.vals[0].eval_node(env) >= self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) >= val1.eval_node(env) else 0)
         elif self.op == '==':
-            return ExprNum(1 if self.vals[0].eval_node(env) == self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) == val1.eval_node(env) else 0)
         elif self.op == '!=':
-            return ExprNum(1 if self.vals[0].eval_node(env) != self.vals[1].eval_node(env) else 0)
+            return NumVal(1 if val0.eval_node(env) != val1.eval_node(env) else 0)
 
     def _list_eval(self, env):
-        pass #TODO
+        """TODO UNCOMMENT AFTER VALS IMPLEMENTED
+        if self.op == 'head':
+            if len(self.vals) == 0:
+                raise IncorrectNumOfArgs("head takes a list as it's argument")
+
+            print(f'DEBUG: self.vals={self.vals}')
+            print(f'DEBUG: self.vals[0]={self.vals[0]}')
+            return ListExpr(self.vals[0].vals)
+            
+        elif self.op == 'tail':
+            pass
+        elif self.op == 'append':
+            pass
+        elif self.op == 'splice':
+            pass #TODO
+        """
 
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator
@@ -303,7 +345,7 @@ class IfExpr(Expr):
     def eval_node(self, env):
 
         # if the condition evaluates to true (non-zero)
-        if self.cond.eval_node(env) != (0):
+        if self.cond.eval_node(env) != NumVal(0):
             return self.act1.eval_node(env)
         
         # else
@@ -329,8 +371,7 @@ class ListExpr(Expr):
         # if the ListExpr is being made by ExprSym, we give it raw data only, so
         # we can take it for what it is, else, we don't have real values yet.
         # exprseq will always have expressions if it comes from parsing
-        self.vals = [] if isinstance(exprseq[0], Expr) else exprseq
-        
+        #self.vals = []
 
     def eval_node(self, env):
         val_list = []
@@ -343,12 +384,9 @@ class ListExpr(Expr):
 
             val_list.append(v)
 
-        self.vals = val_list
-        print(self.vals)
-        return val_list
-    
-    def __str__(self):
-        return str(self.vals)
+        #self.vals = val_list
+        #print(self.vals)
+        return ListVal(val_list)
 
 class Environment():
     """Evnironment of symbols
@@ -402,58 +440,100 @@ class Environment():
 """
 Value replacement classes:
 
-ExprStr
-ExprNum
-ExprSym
+---------------------ExprStr
+----------------------ExprNum
+-----------------------ExprSym
 FuncDef - eval_node() should create a func val
 FuncCall - eval_node() should retrieve FuncVal from evnironment
-PrimOp -
+----------------------PrimOp -
 PrintExpr - handle printing of values (__str__ in values?)
 Environment - holds symbol:Val pairs
-
+"""
 class Val():
-    """"""Value object base class""""""
+    """Value object base class"""
 
     def __init__(self, val):
-        self.val = val
-    
-
-class ValType(Enum):
-    NUM = 2
-    STR = 3
-    LIST = 4
-    NIL = 5
-
-    
+        raise NotImplementedError('Cannot call constructor for Val base class')
+        
 class NumVal(Val):
-    """"""Value wrapper for integers""""""
-     = ValType.NUM
+    """Value wrapper for integers"""
 
-    def __init__(self):
-        pass
+    def __init__(self, val: int):
+        if type(val) is not int:
+            raise ValNotIntendedType(f'Given value is not a NumVal')
+
+        self.val = val
+
+    def __add__(self, other):
+        return NumVal(self.val + other.val)
+    
+    def __sub__(self, other):
+        return NumVal(self.val - other.val)
+    
+    def __mul__(self, other):
+        return NumVal(self.val * other.val)
+    
+    def __floordiv__(self, other):
+        return NumVal(self.val // other.val)
+    
+    def __truediv__(self, other):
+        return NumVal(self.val // other.val)
 
     def __gt__(self, other):
-        if other.typew
-        pass
+        return self.val > other.val
 
     def __lt__(self, other):
-        pass
+        return self.val < other.val
+
+    def __le__(self, other):
+        return self.val <= other.val
+
+    def __ge__(self, other):
+        return self.val >= other.val
+    
+    def __eq__(self, other):
+        return self.val == other.val
+    
+    def __ne__(self, other):
+        return self.val != other.val
+
+    def __str__(self):
+        return str(self.val)
 
 class StrVal(Val):
-    """"""Value wrapper for strings""""""
+    """Value wrapper for strings"""
 
-    def __init__(self):
-        pass
+    def __init__(self, val):
+        if type(val) is not str:
+            raise ValNotIntendedType(f'Given value is not a StrVal')
 
-class NilVal(Val):
-    """"""Nil value representation""""""
-    def __init__(self):
-        pass
+        self.val = val
+    
+    def __str__(self):
+        return self.val
 
 class ListVal(Val):
-    """"""Value wrapper for lists""""""
+    """Value wrapper for lists"""
+    def __init__(self, val):
+        if type(val) is not list:
+            raise ValNotIntendedType(f'Given value is not a ListVal')
+
+        self.val = val
+
+    def head(self):
+        return self.val[0]
+
+    def tail(self):
+        return self.val[1:]
+        
+    def __str__(self):
+        s = "("
+        for v in self.val:
+            s += str(v) + ' '
+        
+        return str(s[:-1] + ')')
+
+class NilVal(Val):
+    """Nil value representation"""
     def __init__(self):
         pass
-
-
-"""

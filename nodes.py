@@ -232,7 +232,7 @@ class PrimOp(Expr):
     _arithmatic_op = ['+', '/', '-', '*']
 
     # list of list operators
-    _list_op = ['head', 'tail', 'append', 'splice']
+    _list_op = ['head', 'tail', 'append', 'splice', 'length']
 
     def __init__(self, op, vals: list):
         self.op = op
@@ -301,13 +301,17 @@ class PrimOp(Expr):
             # TODO can take list or elem or both?
             # TODO check args here
             return self.vals[0].eval_node(env).append(self.vals[1].eval_node(env))
-            pass #TODO
         elif self.op == 'splice':
             if len(self.vals) != 3:
                 raise IncorrectNumOfArgs("""splice takes a list, a start index,
                     and an end index for it's arguments""")
             
             return self.vals[0].eval_node(env).splice(self.vals[1].eval_node(env), self.vals[2].eval_node(env))
+        elif self.op == 'length':
+            if len(self.vals) != 1:
+                raise IncorrectNumOfArgs("length takes a list as it's argument")
+            
+            return self.vals[0].eval_node(env).length()
 
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator
@@ -542,6 +546,9 @@ class ListVal(Val):
 
     def splice(self, start: NumVal, end: NumVal):
         return ListVal(self.val[int(start):int(end)])
+    
+    def length(self):
+        return NumVal(len(self.val))
         
     def __str__(self):
         s = "("

@@ -4,7 +4,12 @@
 ; m = max weight
 ; v = list of item values
 ; w = list of item weight
-(defun k (m v w)
+
+(defun max (v1 v2)
+    (if (> v1 v2) v1 v2)
+)
+
+(defun k (m w v)
     (if (== m 0)
         0
         (if (== (length v) 0)
@@ -21,4 +26,4 @@
 
 )
 
-(print (k 50 (list 60 100 120) (list 10 20 30))) ; '220'
+(print (k 50 (list 10 20 30) (list 60 100 120))) ; '220'

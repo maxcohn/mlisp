@@ -142,10 +142,14 @@ class ExprSym(Expr):
             return ExprStr(v)
         elif type(v) is int:
             return ExprNum(v)
+        elif type(v) is list:
+            return ListExpr(v)
         elif isinstance(v, ExprSym):
             return self.eval_node(env)
         elif isinstance(v, Expr):
             return v
+        
+        raise Exception("Symbol was wasn't a valid type")
 
 ############################################################
 # Expressions
@@ -202,9 +206,12 @@ class PrimOp(Expr):
     # list of arithmatic operators
     _arithmatic_op = ['+', '/', '-', '*']
 
+    # list of list operators
+    _list_op = ['HEAD', 'TAIL', 'APPEND', 'SPLICE']
+
     def __init__(self, op, vals: list):
         self.op = op
-        self.vals = vals
+        self.vals = vals # Expression sequence
 
 
     def _arithmatic_eval(self, env):
@@ -251,6 +258,9 @@ class PrimOp(Expr):
         elif self.op == '!=':
             return ExprNum(1 if self.vals[0].eval_node(env) != self.vals[1].eval_node(env) else 0)
 
+    def _list_eval(self, env):
+        pass #TODO
+
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator
         if self.op in self._arithmatic_op:
@@ -258,6 +268,9 @@ class PrimOp(Expr):
 
         elif self.op in self._comparison_op:
             return self._comparison_eval(env)
+
+        elif self.op in self._list_op:
+            return self._list_eval(env)
 
 class Assignment(Expr):
     """Assignment expression"""
@@ -307,7 +320,35 @@ class PrintExpr(Expr):
         print(v)
         return v
 
+class ListExpr(Expr):
+    """List expression"""
 
+    def __init__(self, exprseq):
+        self.raw_vals = exprseq
+
+        # if the ListExpr is being made by ExprSym, we give it raw data only, so
+        # we can take it for what it is, else, we don't have real values yet.
+        # exprseq will always have expressions if it comes from parsing
+        self.vals = [] if isinstance(exprseq[0], Expr) else exprseq
+        
+
+    def eval_node(self, env):
+        val_list = []
+
+        # get the raw value of each expression
+        for e in self.raw_vals:
+            v = e
+            while isinstance(v, Expr):
+                v = v.eval_node(env)
+
+            val_list.append(v)
+
+        self.vals = val_list
+        print(self.vals)
+        return val_list
+    
+    def __str__(self):
+        return str(self.vals)
 
 class Environment():
     """Evnironment of symbols
@@ -357,4 +398,62 @@ class Environment():
         """
         self.symbol_table[symbol] = val
 
+
+"""
+Value replacement classes:
+
+ExprStr
+ExprNum
+ExprSym
+FuncDef - eval_node() should create a func val
+FuncCall - eval_node() should retrieve FuncVal from evnironment
+PrimOp -
+PrintExpr - handle printing of values (__str__ in values?)
+Environment - holds symbol:Val pairs
+
+class Val():
+    """"""Value object base class""""""
+
+    def __init__(self, val):
+        self.val = val
     
+
+class ValType(Enum):
+    NUM = 2
+    STR = 3
+    LIST = 4
+    NIL = 5
+
+    
+class NumVal(Val):
+    """"""Value wrapper for integers""""""
+     = ValType.NUM
+
+    def __init__(self):
+        pass
+
+    def __gt__(self, other):
+        if other.typew
+        pass
+
+    def __lt__(self, other):
+        pass
+
+class StrVal(Val):
+    """"""Value wrapper for strings""""""
+
+    def __init__(self):
+        pass
+
+class NilVal(Val):
+    """"""Nil value representation""""""
+    def __init__(self):
+        pass
+
+class ListVal(Val):
+    """"""Value wrapper for lists""""""
+    def __init__(self):
+        pass
+
+
+"""

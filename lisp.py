@@ -14,7 +14,8 @@ class LispLexer(Lexer):
 
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
         MINUS, MULT, DIV, SETQ, STRING, IF, GT, LT, GTEQ,
-        LTEQ, EQ, NEQ, PRINT
+        LTEQ, EQ, NEQ, PRINT, LIST, HEAD, TAIL, APPEND,
+        SPLICE
     }
 
     ignore = ' \t'
@@ -42,6 +43,12 @@ class LispLexer(Lexer):
     SYMBOL['setq'] = SETQ
     SYMBOL['if'] = IF
     SYMBOL['print'] = PRINT
+
+    SYMBOL['list'] = LIST
+    SYMBOL['head'] = HEAD
+    SYMBOL['tail'] = TAIL
+    SYMBOL['append'] = APPEND
+    SYMBOL['splice'] = SPLICE
     
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -105,6 +112,10 @@ class LispParser(Parser):
     @_('LPAREN printexpr RPAREN')
     def expr(self, p):
         return p.printexpr
+    
+    @_('LPAREN listexpr RPAREN')
+    def expr(self, p):
+        return p.listexpr
 
     @_('exprseq expr')
     def exprseq(self, p):
@@ -123,7 +134,8 @@ class LispParser(Parser):
         return Assignment(p.SYMBOL, p.expr)
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV', 'GT', 'LT',
-        'LTEQ', 'GTEQ', 'EQ', 'NEQ'
+        'LTEQ', 'GTEQ', 'EQ', 'NEQ', 'HEAD', 'TAIL',
+        'APPEND', 'SPLICE'
     )
     def op(self, p):
         return p[0]
@@ -165,3 +177,7 @@ class LispParser(Parser):
     @_('PRINT expr')
     def printexpr(self, p):
         return PrintExpr(p.expr)
+    
+    @_('LIST exprseq')
+    def listexpr(self, p):
+        return ListExpr(p.exprseq)

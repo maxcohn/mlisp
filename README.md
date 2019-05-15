@@ -44,3 +44,31 @@ No language is without it's quirks
 * Probably will need to add more comparison operator overloading for all expression types
 * type checking for ops and user defined functions
 * better errors
+
+Values
+
+Val - Parent class
+
+ValNum - Integer
+ValStr - String
+ValList - List of Vals
+ValFunc - Replace function definition
+
+TODO
+
+find objects that neeed to access values and make a list
+
+make values
+    add import functions for easy operations
+
+implement values to replace raw data
+
+Add lists via list values
+
+add list functions
+    head
+    tail
+    last
+    init
+    reverse
+    append

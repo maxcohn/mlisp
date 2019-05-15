@@ -56,6 +56,7 @@ ValFunc - Replace function definition
 
 TODO
 
+lambdaexpr - evaluates to FuncVAl
 FuncVal implementation
 Document new code
 possibly divide into new files??

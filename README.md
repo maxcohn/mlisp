@@ -66,7 +66,6 @@ add list functions
     last
     init
     reverse
-    length
     nth
 
 new prim ops:

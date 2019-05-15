@@ -66,3 +66,9 @@ add list functions
     last
     init
     reverse
+    length
+    nth
+
+new prim ops:
+    max, min = works on lists and multiple nums
+    logical and/or/xor/not

@@ -4,6 +4,7 @@ Running this file creates a lexer and parser and then begins a loop for user
 entry. The prompt accepts Lisp code 1 line at a time, which all have access
 to the global/initial environment.
 """
+import sys
 
 import lisp
 import nodes
@@ -28,10 +29,14 @@ if __name__ == "__main__":
         # create syntax tree and then evaluate/print
         ast = parser.parse(lexer.tokenize(i))
         
-        #try:
-        print(ast.eval_node(init_env))
-        #except Exception as e:
-        #    print(e)
-        #    continue
+        try:
+            print(ast.eval_node(init_env))
+        except Exception as e:
+            print(e)
+            for s in sys.exc_info():
+                print(s)
+            continue
+        
+        #print(ast.eval_node(init_env))
         
     print('See ya!')   

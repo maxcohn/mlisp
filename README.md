@@ -56,19 +56,12 @@ ValFunc - Replace function definition
 
 TODO
 
-find objects that neeed to access values and make a list
-
-make values
-    add import functions for easy operations
-
-implement values to replace raw data
-
-Add lists via list values
+FuncVal implementation
+Document new code
+possibly divide into new files??
+add better checking of args to PrimOps
 
 add list functions
-    head
-    tail
     last
     init
     reverse
-    append

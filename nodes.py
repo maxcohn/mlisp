@@ -286,22 +286,28 @@ class PrimOp(Expr):
             return NumVal(1 if val0.eval_node(env) != val1.eval_node(env) else 0)
 
     def _list_eval(self, env):
-        """TODO UNCOMMENT AFTER VALS IMPLEMENTED
         if self.op == 'head':
             if len(self.vals) == 0:
                 raise IncorrectNumOfArgs("head takes a list as it's argument")
 
-            print(f'DEBUG: self.vals={self.vals}')
-            print(f'DEBUG: self.vals[0]={self.vals[0]}')
-            return ListExpr(self.vals[0].vals)
+            return self.vals[0].eval_node(env).head()
             
         elif self.op == 'tail':
-            pass
+            if len(self.vals) == 0:
+                raise IncorrectNumOfArgs("tail takes a list as it's argument")
+
+            return self.vals[0].eval_node(env).tail()
         elif self.op == 'append':
-            pass
-        elif self.op == 'splice':
+            # TODO can take list or elem or both?
+            # TODO check args here
+            return self.vals[0].eval_node(env).append(self.vals[1].eval_node(env))
             pass #TODO
-        """
+        elif self.op == 'splice':
+            if len(self.vals) != 3:
+                raise IncorrectNumOfArgs("""splice takes a list, a start index,
+                    and an end index for it's arguments""")
+            
+            return self.vals[0].eval_node(env).splice(self.vals[1].eval_node(env), self.vals[2].eval_node(env))
 
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator
@@ -499,6 +505,9 @@ class NumVal(Val):
 
     def __str__(self):
         return str(self.val)
+    
+    def __int__(self):
+        return self.val
 
 class StrVal(Val):
     """Value wrapper for strings"""
@@ -524,7 +533,15 @@ class ListVal(Val):
         return self.val[0]
 
     def tail(self):
-        return self.val[1:]
+        return ListVal(self.val[1:])
+
+    def append(self, new_val: Val):
+        new_list = [ v for v in self.val ]
+        new_list.append(new_val)
+        return ListVal(new_list)
+
+    def splice(self, start: NumVal, end: NumVal):
+        return ListVal(self.val[int(start):int(end)])
         
     def __str__(self):
         s = "("

@@ -3,10 +3,6 @@
 All the nodes used to construct an abstract syntax tree
 """
 
-# nodes.py
-#
-# TODO: NEED print, empty param list (new grammar rule)
-
 from exceptions import *
 
 class ASTNode():
@@ -66,87 +62,8 @@ class ExprNum(Expr):
     def eval_node(self, env):
         return self.val
 
-    # The following are operation overloaders for dealing with adding ExprNums
-    def __add__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __add__()')
-        # in case other is an int, just add the int so we don't try to access .val
-        v = other if type(other) is int else other.val
-
-        return ExprNum(v + self.val)
-
-    __radd__ = __add__
-
-    def __sub__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __sub__()')
-        v = other if type(other) is int else other.val
-
-        return ExprNum(self.val - v)
-    
-    def __rsub__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __rsum__()')
-        v = other if type(other) is int else other.val
-
-        return ExprNum(v - self.val)
-
-
-    def __mul__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum __mul__()')
-
-        # in case other is an int, just mult the int so we don't try to access
-        # to acess the int's 'val' attribute, which doesn't exist
-        v = other if type(other) is int else other.val
-
-        return ExprNum(v * self.val)
-
-    __rmul__ = __mul__
-
     def __str__(self):
         return str(self.val)
-
-    ##TODO REMOVE ALL BELOW
-    # The following are overloaded comparison operators for dealing with ExprNums
-    def __gt__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        return self.val > other.val
-
-    def __ge__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        return self.val >= other.val
-
-    def __lt__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        return self.val < other.val
-    
-    def __le__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        if isinstance(other, Expr):
-            return self.val <= other.val
-
-        return self.val <= other
-
-    def __eq__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        if isinstance(other, Expr):
-            return self.val == other.val
-
-        return self.val == other
-
-    def __ne__(self, other):
-        #TODO remove
-        raise Exception('THIS SHOULD BE HAPPENING: ExprNum comparison operator')
-        if isinstance(other, Expr):
-            return self.val != other.val
-
-        return self.val != other
 
 class ExprSym(Expr):
     """Expression for storing a symbol"""
@@ -184,13 +101,12 @@ class FuncDef(ASTNode):
 
     def __init__(self, symbol, params, expr):
         self.symbol = symbol
-        self.params = params
-        self.expr = expr
+        self.val = FuncVal(params, expr)
     
     def eval_node(self, env):
         # Add the symbol that is the function name to the current environment,
         # and the make its associated value this object
-        env.add_symbol(self.symbol, self)
+        env.add_symbol(self.symbol, self.val)
         return self.symbol
 
 class FuncCall(Expr):
@@ -394,8 +310,6 @@ class ListExpr(Expr):
 
             val_list.append(v)
 
-        #self.vals = val_list
-        #print(self.vals)
         return ListVal(val_list)
 
 class Environment():
@@ -447,18 +361,7 @@ class Environment():
         self.symbol_table[symbol] = val
 
 
-"""
-Value replacement classes:
 
----------------------ExprStr
-----------------------ExprNum
------------------------ExprSym
-FuncDef - eval_node() should create a func val
-FuncCall - eval_node() should retrieve FuncVal from evnironment
-----------------------PrimOp -
-PrintExpr - handle printing of values (__str__ in values?)
-Environment - holds symbol:Val pairs
-"""
 class Val():
     """Value object base class"""
 
@@ -556,6 +459,12 @@ class ListVal(Val):
             s += str(v) + ' '
         
         return str(s[:-1] + ')')
+
+class FuncVal(Val):
+
+    def __init__(self, params, expr):
+        self.params = params
+        self.expr = expr
 
 class NilVal(Val):
     """Nil value representation"""

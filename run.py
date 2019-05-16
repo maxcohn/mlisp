@@ -34,5 +34,5 @@ if __name__ == "__main__":
 
     end_time = int(round(time.time() * 1000))
 
-    print(f'Total time for program execution (ms): {0.001 * (end_time - start_time)}')
+    print(f'Total time for program execution (s): {0.001 * (end_time - start_time)}')
     #print(ast.eval_node(init_env))

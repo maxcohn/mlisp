@@ -27,39 +27,52 @@ I've implemented the following:
 * Types:
     * Integers: `10`, `-5`
     * Strings: `"hello world"`
-* If expressions
+    * Functions
+    * Lists: `(list 1 2 3 4 5)`
+* If expressions: `(if cond then else)`
 
-There are examples in the `tests` directory of this repository
+There are examples in the `examples` directory of this repository
 
 ## Quirks
 
 No language is without it's quirks
 
-* There are no booleans, instead we use the classic non-zero = true and zero
-= false
+* There are no booleans, instead we use numbers to represent (similar to C)
+
+## Primitive operations
+
+`+`, `-`, `/`, `*` - Arithmetic operators (2+ numbers)
+
+`>`, `<`, `<=`, `>=`, `==`, `!=` - Comparison operators (2 numbers)
+
+`print` - Prints given value (1 value)
+
+`list` - Creates a list (1+ values)
+
+`head` - Returns first element of list (1 list)
+
+`tail` - Returns list of all elements but first (1 list)
+
+`length` - Returns length of list (1 list)
+
+`append` - Appends given value to list (1 list, value)
+
+`splice` - Returns list spliced by parameters (list, start, end)
 
 ## Possible fixes
 
-* Add values to store underlying data type instead of raw python data
 * Probably will need to add more comparison operator overloading for all expression types
 * type checking for ops and user defined functions
 * better errors
 
-Values
 
-Val - Parent class
-
-ValNum - Integer
-ValStr - String
-ValList - List of Vals
-ValFunc - Replace function definition
-
-TODO
-
+### TODO
 lambdaexpr - evaluates to FuncVAl
-FuncVal implementation
+
 Document new code
+
 possibly divide into new files??
+
 add better checking of args to PrimOps
 
 add list functions
@@ -67,7 +80,3 @@ add list functions
     init
     reverse
     nth
-
-new prim ops:
-    max, min = works on lists and multiple nums
-    logical and/or/xor/not

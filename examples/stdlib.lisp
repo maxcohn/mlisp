@@ -48,3 +48,8 @@
         )
     )
 )
+
+; Modular division
+(defun mod (a b)
+    (- a (* b (/ a b)))
+)

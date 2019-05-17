@@ -204,31 +204,60 @@ class PrimOp(Expr):
 
     def _list_eval(self, env):
         if self.op == 'head':
-            if len(self.vals) == 0:
+            if len(self.vals) != 1:
                 raise IncorrectNumOfArgs("head takes a list as it's argument")
 
-            return self.vals[0].eval_node(env).head()
+            new_val = self.vals[0].eval_node(env)
+            if not new_val.islist():
+                raise ValNotIntendedType("head takes a list as it's argument")
+
+            return new_val.head()
             
         elif self.op == 'tail':
-            if len(self.vals) == 0:
+            if len(self.vals) != 1:
                 raise IncorrectNumOfArgs("tail takes a list as it's argument")
+            
+            new_val = self.vals[0].eval_node(env)
 
-            return self.vals[0].eval_node(env).tail()
+            if not new_val.islist():
+                raise ValNotIntendedType("head takes a list as it's argument")
+                
+            return new_val.tail()            
+
         elif self.op == 'append':
-            # TODO can take list or elem or both?
-            # TODO check args here
-            return self.vals[0].eval_node(env).append(self.vals[1].eval_node(env))
+            if len(self.vals) != 2:
+                raise IncorrectNumOfArgs("append takes a list and a value as it's arguments")
+
+            new_vals = [v.eval_node(env) for v in self.vals]
+
+            if not new_vals[0].islist():
+                raise ValNotIntendedType("append takes a list and a value as it's arguments")
+            
+            return new_vals[0].append(new_vals[1])
+
         elif self.op == 'splice':
             if len(self.vals) != 3:
-                raise IncorrectNumOfArgs("""splice takes a list, a start index,
+                #TODO fix these error messages
+                raise IncorrectNumOfArgs("""splice takes a list, a start index,\
+                    and an end index for it's arguments""")
+
+            new_vals = [v.eval_node(env) for v in self.vals]
+            
+            if not (new_vals[0].islist() and new_vals[1].isnum() and new_vals[2].isnum()):
+                raise ValNotIntendedType("""splice takes a list, a start index,\
                     and an end index for it's arguments""")
             
-            return self.vals[0].eval_node(env).splice(self.vals[1].eval_node(env), self.vals[2].eval_node(env))
+            return new_vals[0].splice(new_vals[1], new_vals[2])
         elif self.op == 'length':
             if len(self.vals) != 1:
                 raise IncorrectNumOfArgs("length takes a list as it's argument")
             
-            return self.vals[0].eval_node(env).length()
+            new_val = self.vals[0].eval_node(env)
+
+            if not new_val.islist():
+                raise ValNotIntendedType("length takes a list as it's argument")
+
+            return new_val.length()
 
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator
@@ -242,7 +271,11 @@ class PrimOp(Expr):
             return self._list_eval(env)
 
 class Assignment(Expr):
-    """Assignment expression"""
+    """Assignment expression
+    
+    Upon evaluation, the given symbol is added to the given environment with
+    it's value being the result of the given expression.
+    """
 
     def __init__(self, symbol, expr: Expr):
         self.symbol = symbol
@@ -261,7 +294,12 @@ class Assignment(Expr):
         return expr_val
 
 class IfExpr(Expr):
-    """If expression"""
+    """If expression
+    
+    Given three expressions, a condition, and two actions. The condition is
+    evaluated to a boolean expression. If the expression is true, we use the
+    first action, otherwise, we use the second action.
+    """
 
     def __init__(self, cond, act1, act2):
         # condition, followed by 'then' and 'else'
@@ -279,7 +317,10 @@ class IfExpr(Expr):
         return self.act2.eval_node(env)
         
 class PrintExpr(Expr):
-    """Print expression"""
+    """Print expression
+    
+    Evaluates the given expression, prints the result, and then returns it.
+    """
     def __init__(self, expr: Expr):
         self.expr = expr
     

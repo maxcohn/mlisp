@@ -6,6 +6,18 @@ class Val():
 
     def __init__(self, val):
         raise NotImplementedError('Cannot call constructor for Val base class')
+    
+    def islist(self):
+        return isinstance(self, ListVal)
+
+    def isnum(self):
+        return isinstance(self, NumVal)
+
+    def isstr(self):
+        return isinstance(self, StrVal)
+    
+    def isfunc(self):
+        return isinstance(self, FuncVal)
         
 class NumVal(Val):
     """Value wrapper for integers"""
@@ -93,6 +105,9 @@ class ListVal(Val):
         return NumVal(len(self.val))
         
     def __str__(self):
+        if len(self.val) == 0:
+            return '()'
+        
         s = "("
         for v in self.val:
             s += str(v) + ' '

@@ -182,3 +182,7 @@ class LispParser(Parser):
     @_('LIST exprseq')
     def listexpr(self, p):
         return ListExpr(p.exprseq)
+    
+    @_('LIST')
+    def listexpr(self, p):
+        return ListExpr([])

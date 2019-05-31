@@ -15,7 +15,7 @@ class LispLexer(Lexer):
     tokens = {LPAREN, RPAREN, NUMBER, SYMBOL, DEFUN, PLUS,
         MINUS, MULT, DIV, SETQ, STRING, IF, GT, LT, GTEQ,
         LTEQ, EQ, NEQ, PRINT, LIST, HEAD, TAIL, APPEND,
-        SPLICE, LENGTH
+        SPLICE, LENGTH, NTH
     }
 
     ignore = ' \t'
@@ -50,6 +50,7 @@ class LispLexer(Lexer):
     SYMBOL['append'] = APPEND
     SYMBOL['splice'] = SPLICE
     SYMBOL['length'] = LENGTH
+    SYMBOL['nth'] = NTH
     
     @_(r'\n+')
     def ignore_newline(self, t):
@@ -136,7 +137,7 @@ class LispParser(Parser):
 
     @_('PLUS', 'MINUS', 'MULT', 'DIV', 'GT', 'LT',
         'LTEQ', 'GTEQ', 'EQ', 'NEQ', 'HEAD', 'TAIL',
-        'APPEND', 'SPLICE', 'LENGTH'
+        'APPEND', 'SPLICE', 'LENGTH', 'NTH'
     )
     def op(self, p):
         return p[0]

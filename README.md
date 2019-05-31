@@ -59,6 +59,8 @@ No language is without it's quirks
 
 `splice` - Returns list spliced by parameters (list, start, end)
 
+`nth` - Returns value at the n-th position in the list (indexed at 0) (list, index)
+
 ## Possible fixes
 
 * Probably will need to add more comparison operator overloading for all expression types

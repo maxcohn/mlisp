@@ -149,7 +149,7 @@ class PrimOp(Expr):
     _arithmatic_op = ['+', '/', '-', '*']
 
     # list of list operators
-    _list_op = ['head', 'tail', 'append', 'splice', 'length']
+    _list_op = ['head', 'tail', 'append', 'splice', 'length', 'nth']
 
     def __init__(self, op, vals: list):
         self.op = op
@@ -258,6 +258,17 @@ class PrimOp(Expr):
                 raise ValNotIntendedType("length takes a list as it's argument")
 
             return new_val.length()
+        elif self.op == 'nth':
+            if len(self.vals) != 2:
+                raise IncorrectNumOfArgs("nth takes a list and an index as it's argument")
+
+            new_vals = [v.eval_node(env) for v in self.vals]
+
+            if not (new_vals[0].islist() or new_vals[1].isnum()):
+                raise ValNotIntendedType("nth takes a list and an index as it's argument")
+            
+            return new_vals[0].nth(new_vals[1])
+
 
     def eval_node(self, env):
         # check if the given op was an arithmatic operator or a comparison operator

@@ -103,6 +103,10 @@ class ListVal(Val):
     
     def length(self):
         return NumVal(len(self.val))
+    
+    def nth(self, i: int):
+        #TODO TEST MORE
+        return self.val[int(i)]
         
     def __str__(self):
         if len(self.val) == 0:

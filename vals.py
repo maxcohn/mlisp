@@ -1,4 +1,9 @@
+"""Value objects
 
+These are the values used by the interpreter to do all operations with.
+It's easier to have these wrapper values for interacting with each other
+in the AST.
+"""
 from exceptions import *
 
 class Val():

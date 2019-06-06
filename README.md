@@ -61,6 +61,15 @@ No language is without it's quirks
 
 `nth` - Returns value at the n-th position in the list (indexed at 0) (list, index)
 
+## How do I run it?
+
+There are two ways of running the interpreter. You can access a REPL by running
+`repl.py` with no arguments. This is a traditional read-evaluate-print-loop that's
+great for testing basics of the interpreter.
+
+The other is with `run.py`. `run.py` is used to run a program stored in another file.
+It takes 1 argument, which is the file you'd like to run.
+
 ## Possible fixes
 
 * Probably will need to add more comparison operator overloading for all expression types

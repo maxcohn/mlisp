@@ -1,6 +1,19 @@
 
 # mlisp - Lisp Interpreter
 
+## Note:
+
+I just realised while reading the Wikipedia article on S-expressions that
+I have really overcomplicated the design of a lisp interpreter. Because
+sexprs have such a simple design, they can be parsed much simpler and
+faster than using a traditional grammar approach like this project uses.
+
+That being said, I'm going to leave this project as is because I still
+think it is a solid use of grammar passing techniques, but I will implement
+a Lisp interpreter again, taking advantage of the simplicity of sexprs.
+When I do, I'll link to it here. 
+
+
 ## What is this?
 
 I've grown to have a big appreciation for languages, language design, and
